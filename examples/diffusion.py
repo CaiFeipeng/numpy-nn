@@ -1,13 +1,16 @@
-"""TBD"""
+"""
+        TBD
+"""
 from src.dataset.cifar import Cifar10
 import src.nn as nn
 import time
 from models.diffusion import Diffusion
+from models.unet import TinyUnet
 
 def train():
     epochs = 60
-    
-    model = Diffusion(image_channels=3)
+    unet = TinyUnet(image_channels=3)
+    model = Diffusion(model=unet)
     
     optmizer = nn.SGDOptimizer(model.layers, learning_rate=0.0001, decay=0.1)
 

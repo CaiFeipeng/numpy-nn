@@ -5,9 +5,9 @@ Welcome to the NumPy Neural Network Library! Have you ever desired a collection 
 ## Features
 
 - **Modular Design**: The library is structured in a modular way, allowing users to easily construct, customize, and train various types of neural network architectures.
-- **Multiple Architectures**: It includes implementations of popular neural network architectures such as Multi-Layer Perceptrons (MLP), Convolutional Neural Networks (CNN), Transformers, Variational Autoencoders (VAE), and Diffusion models.
+- **Multiple Architectures**: It includes implementations of popular neural network architectures such as Multi-Layer Perceptrons (MLP), Convolutional Neural Networks (CNN), Transformers, Variational Autoencoders (VAE), and Diffusion(TBD) models etc.
 - **Flexible and Extensible**: Users can easily extend the library by implementing custom layers, loss functions, and optimizers.
-- **Efficient NumPy Implementation**: All computations are performed using NumPy arrays, ensuring efficient execution on CPUs/GPUs.
+- **Efficient NumPy Implementation**: All computations are performed using NumPy arrays, ensuring efficient execution on CPU/GPU.
 
 ## Installation
 
