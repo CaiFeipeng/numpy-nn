@@ -1,0 +1,4 @@
+data/cifar-10-batches-py
+data/multi30k
+.vscode/
+**/__pycache__/
