@@ -8,8 +8,8 @@ class ReLU(Layer):
     
     def forward(self, inputs, training=True):
         self.inputs = inputs
-        self.outputs = np.maximum(0, inputs)
-        return self.outputs
+        outputs = np.maximum(0, inputs)
+        return outputs
     
     def __call__(self, *args, **kwds):
         return self.forward(*args, **kwds)
@@ -18,6 +18,19 @@ class ReLU(Layer):
         self.dinputs  = dvalues.copy()
         self.dinputs[self.inputs <= 0] = 0
         return self.dinputs
+   
+class LeakyReLU(Layer):
+    def __init__(self, negative_slope=0.01) -> None:
+        self.negative_slope=negative_slope
+        
+    def forward(self, inputs, training=True):
+        self.inputs = inputs
+        outputs = np.where(inputs <= 0, self.negative_slope * inputs, inputs)
+        return outputs
+    
+    def backward(self, dvalues):
+        dvalues = dvalues * np.where(self.inputs <= 0, self.negative_slope, 1)
+        return dvalues
     
 class Sigmoid(Layer):
     def forward(self, inputs, training=True):
@@ -58,11 +71,5 @@ class SoftMax(Layer):
         dexp = dexp_1 + dexp_2
         self.dinputs = dexp * self.exp
         
-        # expand_softmax = np.expand_dims(self.softmax, axis=-1)
-        # repeat_softmax = np.repeat(expand_softmax, repeats=dim, axis=-1)
-        # d_softmax = repeat_softmax * np.identity(self.softmax.shape[-1]) - np.matmul(expand_softmax, np.moveaxis(expand_softmax, -1,-2))
-        # expand_dvalues = np.expand_dims(dvalues, axis=-2)
-        # self.dinputs = np.matmul(expand_dvalues, d_softmax)
-        # self.dinputs = np.squeeze(self.dinputs, axis=-2)
         return self.dinputs
     

@@ -8,7 +8,7 @@ class Layer:
         raise NotImplemented
     
     def __call__(self, *args: Any, **kwds: Any) -> Any:
-        return self.forward(**args, **kwds)
+        return self.forward(*args, **kwds)
     
     def backward(self, *args, **kwargs):
         """backward"""

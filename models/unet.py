@@ -19,9 +19,9 @@ class ResBlock(nn.Layer):
             self.conv_trans = nn.Conv2D(out_channels, out_channels, kernel_size=(4,4), stride=2, padding=1)
 
         self.conv2 = nn.Conv2D(out_channels, out_channels, kernel_size=(3,3), padding=1)
-        self.relu1 = nn.ReLU()
-        self.relu2 = nn.ReLU()
-        self.relu3 = nn.ReLU()
+        self.relu1 = nn.LeakyReLU()
+        self.relu2 = nn.LeakyReLU()
+        self.relu3 = nn.LeakyReLU()
         
         self.batchnorm1 = nn.BatchNorm2D(out_channels)
         self.batchnorm2 = nn.BatchNorm2D(out_channels)
@@ -78,17 +78,17 @@ class ResBlock(nn.Layer):
         return grads
     
     
-class TinyUnet:
+class Unet:
     def __init__(self, image_channels, down_channels=[8,16,16], up_channels=[16,16,8], max_time=1000):
         self.image_channels = image_channels
         self.max_time = max_time
         time_embed_dim=32
         
-        self.time_embed = nn.Sequential([
+        self.time_embed = nn.Sequential(
             nn.PositionalEncoding(max_len=max_time, output_d=time_embed_dim),
             nn.Linear(time_embed_dim, time_embed_dim),
-            nn.ReLU()
-        ])
+            nn.LeakyReLU()
+        )
         
         self.input_conv = nn.Conv2D(image_channels, down_channels[0], kernel_size=(3,3), padding=1)
         self.output_conv = nn.ConvTranspose2D(up_channels[-1], image_channels, kernel_size=(3,3), padding=1)
@@ -151,7 +151,7 @@ class TinyUnet:
 if __name__=='__main__':
     x = np.arange(512).reshape(2,1,16,16)
     t = np.arange(2).reshape(2)
-    unet = TinyUnet(1)
+    unet = Unet(1)
     out = unet(x, t)
     dvalue = unet.backward(out)
     print(out)

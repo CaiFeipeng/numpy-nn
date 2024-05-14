@@ -71,10 +71,10 @@ class Autoencoder(nn.Layer):
         
         encoder = [self.input_conv] + [ResBlock(down_channels[i], down_channels[i+1]) \
                                        for i in range(len(down_channels)-1)]
-        self.encoder = nn.Sequential(encoder)
+        self.encoder = nn.Sequential(*encoder)
         decoder = [ResBlock(up_channels[i], up_channels[i+1], up=True) for i in range(len(up_channels)-1)] \
                     + [self.output_conv]
-        self.decoder = nn.Sequential(decoder)
+        self.decoder = nn.Sequential(*decoder)
         self.layers = [self.decoder, self.encoder]
         
         self.mse_loss = nn.MSELoss()

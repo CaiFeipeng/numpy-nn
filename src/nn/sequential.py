@@ -1,8 +1,8 @@
 import src.nn as nn
 
 class Sequential(nn.Layer):
-    def __init__(self, layers) -> None:
-        self.layers = layers
+    def __init__(self, *layers) -> None:
+        self.layers = list(layers)
         
     def add(self, layer):
         self.layers.append(layer)

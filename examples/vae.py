@@ -3,6 +3,10 @@ from src.dataset.toy_dataset import MultiClassDataset
 import src.nn as nn
 import time
 from models.vae import VAE
+try:
+    import cupy as np
+except:
+    import numpy as np
 
 def train():
     epochs = 60
@@ -16,10 +20,10 @@ def train():
     for ep in range(epochs):
         start_time = time.time()
         for iter, (batch, label) in enumerate(dataloader):
-            # batch = batch.reshape(10,3,8,8)
+            batch, label = np.asarray(batch), np.asarray(label)
             encoded, decoded = model(batch)
             drecons, dmu, dlog_var, loss = model.loss_func(decoded, batch)
-            # optmizer.zero_grad()
+            
             model.backward(drecons, dmu, dlog_var) # loss.backward()
             optmizer.update()
             if iter % 10 == 0:
