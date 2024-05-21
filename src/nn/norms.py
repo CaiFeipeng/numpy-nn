@@ -84,8 +84,8 @@ class LayerNorm(Layer):
         self.inputs = inputs
         mean = inputs.mean(axis=(-1), keepdims=True)
         self.std = inputs.std(axis=(-1), keepdims=True) + self.eps
-        self.inputs_mu = inputs - mean
-        outputs = self.gamma * self.inputs_mu / (self.std) + self.beta
+        self.inputs_centered = inputs - mean
+        outputs = self.gamma * self.inputs_centered / (self.std) + self.beta
         return outputs
     
     def __call__(self, *args, **kwds):
@@ -94,19 +94,30 @@ class LayerNorm(Layer):
     def backward(self, dvalues):
         dim = dvalues.shape[-1]
         
-        self.dgamma = np.sum(dvalues * self.inputs_mu / self.std, axis=0, keepdims=True)
+        self.dgamma = np.sum(dvalues * self.inputs_centered / self.std, axis=0, keepdims=True)
         self.dgamma = np.sum(self.dgamma.reshape(-1, dim), axis=0)
         self.dbeta = np.sum(dvalues.reshape(-1, dim), axis=0)
         
-        dlxhat = dvalues * self.gamma
-        dxhatx = 1 / self.std
-        dlvar = -0.5 * np.sum(self.gamma * self.inputs_mu * self.std**(-3) * dvalues, axis=-1, keepdims=True)
-        dvarx = 2 * self.inputs_mu / dim
-        dlmu = -1 * np.sum(dlxhat / self.std, axis=-1, keepdims=True) + -2 / dim * np.sum(dlvar * self.inputs_mu)
+        dxhat = dvalues * self.gamma
+        dinput_centered = dxhat / self.std
+        dvar = -0.5 * np.sum(dxhat * self.inputs_centered * self.std **(-3), axis=-1, keepdims=True) 
+        dsq = dvar * 1/dim
+        dinput_centered_var = 2 * self.inputs_centered * dsq
         
-        self.dinput = dlxhat * dxhatx + dlvar * dvarx + dlmu / dim
+        dinput_centered = dinput_centered + dinput_centered_var
         
-        return self.dinput
+        dmu = -1 * np.sum(dinput_centered, axis=-1, keepdims=True)
+        dinput_mu = 1/dim * dmu
+        dinputs = dinput_centered + dinput_mu
+        # dlxhat = dvalues * self.gamma
+        # dxhatx = 1 / self.std
+        # dlvar = -0.5 * np.sum(self.gamma * self.inputs_mu * self.std**(-3) * dvalues, axis=-1, keepdims=True)
+        # dvarx = 2 * self.inputs_mu / dim
+        # dlmu = -1 * np.sum(dlxhat / self.std, axis=-1, keepdims=True) + -2 / dim * np.sum(dlvar * self.inputs_mu)
+        
+        # self.dinput = dlxhat * dxhatx + dlvar * dvarx + dlmu / dim
+        
+        return dinputs
         
     @property
     def params(self):
